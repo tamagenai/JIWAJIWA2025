@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>じわじわ金大</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      height: 100vh;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .header {
+      position: fixed;
+      top: 0px;
+      left: 0px;
+      z-index: 10;
+      background-color: lemonchiffon;
+      width: 100%;
+
+
+    }
+
+    .header2 {
+
+      display: flex;
+    }
+
+    .linkurl {
+      margin-left: auto;
+    }
+
+    #flash {
+      display: inline-block;
+      width: 100px;
+      height: 40px;
+      cursor: pointer;
+      background-color: skyblue;
+      text-decoration: none;
+      text-align: center;
+      line-height: 50px;
+      border-radius: 6px
+    }
+
+
+
+    .dataContent {
+      margin-left: 30px;
+      padding-top: 120px;
+      display: block;
+    }
+
+    .dataNone {
+      display: none;
+    }
+
+    .clkBtn {
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .divFlex {
+      display: flex;
+    }
+
+    .sheetSelect {
+      padding-top: 0px;
+    }
+
+    .speed {
+      padding-top: 0px;
+    }
+
+    .STOPMP3 {
+      margin-left: 10px
+    }
+
+    .classGazou {
+      display: inline-block;
+      width: 50px;
+      height: 50px;
+      text-decoration: none;
+      background-image: linear-gradient(to bottom,
+          rgba(255, 255, 0, 0.5),
+          rgba(0, 0, 255, 0.5));
+    }
+
+    .classSite {
+      display: inline-block;
+      width: 50px;
+      height: 20px;
+      text-decoration: none;
+      cursor: pointer;
+    }
+
+    .wordcard-button {
+      margin-left: auto;
+      padding: 8px 16px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      text-decoration: none;
+      display: inline-block;
+      margin-right: 10px;
+    }
+
+    .wordcard-button:hover {
+      background-color: #45a049;
+    }
+
+    .loading {
+      position: fixed;
+      top: 100px;
+      left: 100px;
+      z-index: 99;
+      content: '';
+      display: block;
+      margin: auto;
+      width: 300px;
+      border: 4px solid #ccc;
+      border-right-color: #0AC;
+      border-radius: 100px;
+      width: 30px;
+      height: 30px;
+      background-color: white;
+      animation: rotation 0.6s linear infinite;
+    }
+
+    @keyframes rotation {
+      from {
+        transform: rotate(0);
+      }
+
+      to {
+        transform: rotate(360deg);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div id="kurukuru" class="loading"></div>
+  <div class="header">
+
+
+
+    <div class="header2">
+      <div class="logo">
+        <h3>
+          じわじわ身につく中国語【会話篇】
+        </h3>
+      </div>
+      <div class="linkurl">
+        <a href="https://script.google.com/macros/s/AKfycbxit3_KIGgWFaldwTaRh6bL9RfomVZkB4fuwpqemZ3NSP1eSOxfRK0U9YFxqZQZ7NSr/exec"
+          class="wordcard-button" target="_blank">単語カード</a>
+
+
+      </div>
+
+
+    </div>
+    <div class="divFlex">
+      <div class="sheetSelect">
+
+        <label for="sheet-select">選択：</label><select id="sheet-select" name="sheetSelect"></select>
+      </div>
+      <div class="speed">
+        <label for="speech-Speed">　スピード:</label>
+
+        <select name="speechSpeed" id="speech-Speed">
+          <option value="1.0">1.0</option>
+          <option value="0.9">0.9</option>
+          <option value="0.8">0.8</option>
+          <option value="0.7">0.7</option>
+          <option value="0.6">0.6</option>
+          <option value="0.5">0.5</option>
+          <option value="1.1">1.1</option>
+          <option value="1.2">1.2</option>
+          <option value="1.3">1.3</option>
+          <option value="1.4">1.4</option>
+          <option value="1.5">1.5</option>
+          <option value="1.6">1.6</option>
+          <option value="1.7">1.7</option>
+          <option value="1.8">1.8</option>
+          <option value="1.9">1.9</option>
+          <option value="2.0">2.0</option>
+
+        </select>
+      </div>
+      <div class="STOPMP3">
+        <button id="stopMP3" onclick="fncStopMP3(this)">MP3 停止</button>
+      </div>
+
+
+
+
+    </div>
+  </div>
+  <div id="main">
+    <div id="container">
+
+    </div>
+
+
+  </div>
+
+
+
+
+  <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+  <script>
+    // スプレッドシート　列　定数定義
+    const END_POINT = "https://script.google.com/macros/s/AKfycbylU_kEXdPpqIpcO9MZJvXFv0yZW3Y3TgVxPbGzI01-5jdOgDuKKhT2URui_nGsziTr/exec";
+    // デバイスの種類を判別
+    const userAgent = navigator.userAgent;
+
+    let isIphone = false;
+    if (userAgent.includes("iPhone")) {
+      isIphone = true;
+      console.log("このデバイスはiPhoneです");
+    } else if (userAgent.includes("Android")) {
+      console.log("このデバイスはAndroidです");
+    } else if (userAgent.includes("Windows") || userAgent.includes("Mac")) {
+      console.log("このデバイスはPCです");
+    } else {
+      console.log("不明なデバイスです");
+    }
+    console.log("userAgent:", userAgent);
+
+    // 2025-03-19
+    let voices = [];
+    // 初期音声リストの取得
+    voices = speechSynthesis.getVoices();
+    // 音声リストが取得できない場合は、音声リストが取得できるようになるまで待機
+    //   2025-03-19
+    let sheetIndex;  // 現在処理中のシートのindex
+    let saveAllDatas;
+    let sheetDatas;
+    let mp3Start = false;
+    const bgColorNothing = '#ffffff';
+    const bgColorGazou = '#000000';
+    const bgColorSite = '#00000a';
+    const bgColorMP3 = '#fffffb';  //2025-04-17
+    const bgColorPinyin = '#fffffa';
+
+    const sheetSelector = document.getElementById("sheet-select");
+    let container = document.getElementById('container');
+    let kurukuru = document.getElementById('kurukuru');
+    let classSTOPMP3 = document.querySelector('.STOPMP3');
+    let stopMP3 = document.getElementById('stopMP3');
+
+    classSTOPMP3.style.display = 'none';
+    let music = new Audio();
+    //  mp3ファイルの再生が完了したときに呼び出される。
+    music.addEventListener("ended", () => {
+      mp3Start = false;
+      classSTOPMP3.style.display = 'none';
+
+    });
+    // edge bingに相談してそのまま使う。
+    // google.script.run.withSuccessHandler(function(allDatas) { // getSheetNames関数が成功したら実行する関数
+    //   saveAllDatas = allDatas;
+    //   setSheetNames(allDatas[0]);
+    //   //
+
+    //     sheetDatas = allDatas;
+    //     renderSheetDatas(sheetDatas);
+    //     kurukuru.remove();
+    //     iniCSSSet();
+
+    // }).getAllDatas(); // getSheetNames関数を呼び出す
+
+    // edge
+    getFromGAS();//起動時のデータ取得
+
+    //----------- 以下、関数定義--------------------------
+
+    function getFromGAS() {
+
+      $.ajax({
+        type: "GET",
+        url: END_POINT,
+        // data: { sheetNo: SHEET_NO }
+
+      }).done((result) => {        // 成功した時の処理
+        console.log("get done:" + result);
+        setSheetNames(JSON.parse(result)[0]);
+
+        // getFromGAS(1);
+        sheetDatas = JSON.parse(result);
+
+        renderSheetDatas(sheetDatas);
+
+        kurukuru.remove();
+
+        iniCSSSet();
+      }).fail((error) => {  // 失敗した時の処理
+        alert('Error:' + JSON.stringify(error));
+
+      }).always((data) => {// 常にやる処理
+        // do something
+        // enableControlElements();
+      });
+    }
+    function setSheetNames(sheetNamesArray) {
+      sheetSelector.innerHTML = "";
+      document.createElement('option')
+      sheetNamesArray.forEach((sheetName, index) => {
+        let option = document.createElement('option');
+        option.setAttribute('value', index + 1);
+        option.innerHTML = sheetName;
+        sheetSelector.appendChild(option);
+      });
+    }
+
+    var tdOLD;//2023/04/27追加
+    let tdOLDColor;  // 20231223 追加
+
+    // 23-07-04 シートが変更されたときに実行される。----------------------
+
+    let select = document.querySelector('[name="sheetSelect"]');
+
+    select.onchange = event => {
+      var selIndex = select.selectedIndex;
+      sheetIndex = selIndex;
+      console.log(select.selectedIndex);
+      var classElement = document.getElementsByClassName('dataContent');
+      for (let i = 0; i < classElement.length; i++) {
+        if (selIndex === i) {
+
+          classElement[i].classList.remove("dataNone");
+        } else {
+          classElement[i].classList.add("dataNone");
+
+        }
+
+      }
+    }
+    // 
+
+    // mp3
+    function speakMp3(param1) {
+      if (mp3Start) {
+        return;
+      }
+
+      mp3Start = true;
+      classSTOPMP3.style.display = 'block';
+
+      const td = param1;
+      //2023/04/27 追加　背景色
+      // if (tdOLD === undefined) {
+      //   tdOLD = param1;
+      //   tdOLDColor = tdOLD.style.backgroundColor;
+      // } else {
+      //   tdOLD.style.backgroundColor = tdOLDColor;
+      //   tdOLD = param1;
+
+      // }
+
+
+
+    
+        
+        music.src = td;
+        music.play();
+        console.log("Playing audio");
+     
+
+    }
+
+    //
+    function speakData(param1, param2) {
+      if (mp3Start) {
+        return;
+      }
+
+
+
+      // if (param1 instanceof HTMLTableCellElement) {
+      const td = param1;
+      //2023/04/27 追加　背景色
+      if (tdOLD === undefined) {
+        tdOLD = param1;
+        tdOLDColor = tdOLD.style.backgroundColor;
+      } else {
+        tdOLD.style.backgroundColor = tdOLDColor;
+        tdOLD = param1;
+        tdOLDColor = tdOLD.style.backgroundColor;
+
+      }
+      //2023/04/27 追加　背景色
+      td.style.backgroundColor = 'cyan';//2023/04/27追加　背景色　変更可能
+      var uttr = new SpeechSynthesisUtterance(td.textContent);
+      uttr.lang = "zh-CN"
+      // 利用可能な音声を確認 2025-03-19
+      const voices = speechSynthesis.getVoices();
+      const chineseVoice = getChineseVoice();
+
+      if (chineseVoice) {
+        uttr.voice = chineseVoice;
+      } else {
+        console.warn('Chinese voice not found, using default voice.');
+      }
+      // 2025-03-19
+      uttr.rate = speakSpeedRate();
+      speechSynthesis.cancel();
+      speechSynthesis.speak(uttr);
+
+      // }
+
+    }
+    // 2025-03-19
+    function getChineseVoice() {
+      if (voices.length === 0) {
+        voices = speechSynthesis.getVoices();
+      }
+      return voices.find(voice => voice.lang === 'zh-CN');
+    }
+
+    // 音声リストが更新されたときに再取得
+    speechSynthesis.onvoiceschanged = function () {
+      voices = speechSynthesis.getVoices();
+    };
+    // 2025-03-19
+    function renderSheetDatas(sheetDatas) {
+
+      let div, table, tr, td, tbody, atag;
+      for (let i = 1; i < sheetDatas.length; i++) {
+        div = document.createElement('div');
+        div.setAttribute('class', 'dataContent');
+
+        container.appendChild(div);
+        //
+        table = document.createElement('table');
+        table.setAttribute('border', '1');
+        div.appendChild(table);
+        tbody = document.createElement('tbody');
+        table.appendChild(tbody);
+        for (let j = 0; j < sheetDatas[i].length; j++) {
+          tr = document.createElement('tr');
+          let strContent;
+          let strName;
+          let strBgColor;
+          let splitURL;
+          let siteComment;
+          let siteAddress;
+          for (let k = 0; k < sheetDatas[i][j].length; k++) {
+            td = document.createElement('td');
+            if (sheetDatas[i][j][k] === '') {
+              td.textContent = '    ';
+            } else {
+
+              strContent = sheetDatas[i][j][k];
+              [strName, strBgColor] = cnvString(strContent);
+              switch (strBgColor) {
+                case bgColorGazou:
+
+
+
+                  splitURL = strName.split("/");
+                  fileURL = "https://lh3.googleusercontent.com/d/" + splitURL[5];
+                  atag = document.createElement('a');
+
+                  let gazouURL0 = fileURL;
+                  atag.setAttribute('href', gazouURL0);
+                  atag.setAttribute('class', 'classGazou');
+                  atag.setAttribute('target', '_blank');
+
+                  let img = document.createElement('img');
+
+
+                  img.setAttribute('src', gazouURL0);
+                  img.setAttribute('class', 'classGazou');
+                  // atag.setAttribute('target', '_blank');
+
+
+                  atag.appendChild(img);
+                  td.appendChild(atag);
+                  break;
+                case bgColorSite:
+                  // let siteComment;
+                  // let siteAddress;
+                  [siteComment, siteAddress] = cnVSiteString(strName);
+
+                  atag = document.createElement('a');
+
+
+                  atag.setAttribute('href', siteAddress);
+                  atag.setAttribute('class', 'classSite');
+                  atag.setAttribute('target', '_blank');
+                  atag.innerHTML = siteComment;
+                  // atag.innerHTML = '参考サイト';
+
+                  td.appendChild(atag);
+                  break;
+                case bgColorPinyin:
+
+                  td.textContent = strName.substring(0, 1).toUpperCase() + strName.substring(1);
+                  break;
+                case bgColorMP3:
+                  [siteComment, mp3File] = cnVMp3String(strName);
+                  let mp3FileX = "mp3Files/" + mp3File;
+                  console.log(mp3File);
+                  td.textContent = siteComment;
+                  td.setAttribute('onclick', `speakMp3('${mp3FileX}')`);
+
+
+                  td.setAttribute('class', 'clkBtn');
+                  td.style.backgroundColor = "#fffacd";
+                  break;
+
+                case bgColorNothing:
+                  td.textContent = strName;
+                  break;
+                default:
+                  td.textContent = strName;
+                  td.setAttribute('onclick', 'speakData(this)');
+                  td.setAttribute('class', 'clkBtn');
+                  td.style.backgroundColor = strBgColor;
+
+
+
+
+
+
+              }
+            }
+            tr.appendChild(td);
+          }
+
+
+
+          tbody.appendChild(tr);
+        }
+
+      }
+
+      //
+
+
+    }
+
+    //
+    function cnvString(strContent) {
+      let strName;
+      let strBgColor;
+      [strName, strBgColor] = strContent.split('高*沢');
+      return [strName, strBgColor];
+    }
+    // 
+    function cnVSiteString(strName) {
+      let siteComment;
+      let siteAddress;
+      let comment2 = strName.split('/http');
+      if (comment2.length === 1) {
+        siteComment = '参考サイト';
+        siteAddress = strName;
+
+      } else {
+        let comment3 = strName.split('/');
+        siteComment = comment3[0];
+
+        siteAddress = strName.substring(comment3[0].length + 1, strName.length);
+
+      }
+      return [siteComment, siteAddress];
+
+    }
+    //
+    function cnVMp3String(strName) {
+      let siteComment;
+      let mp3File;
+      mp3File = strName.split('/');
+      if (mp3File.length === 1) {
+        siteComment = 'MP3🔊';
+        mp3File = strName;
+      } else {
+        
+        [siteComment, mp3File] = strName.split('/');
+      }
+
+      return [siteComment, mp3File];
+
+    }
+    // イニシャル　CSS セット　　最初のシートをイニシャル画面にする。
+    function iniCSSSet() {
+      sheetIndex = 0;
+      var classElement = document.getElementsByClassName('dataContent');
+      for (let i = 1; i < classElement.length; i++) {
+        classElement[i].classList.add("dataNone");
+      }
+
+    }
+    // speak speed 調整 2023-07-04
+    function speakSpeedRate() {
+
+      let select = document.querySelector('[name="speechSpeed"]');
+
+      var rate = parseFloat(select.selectedOptions[0].value);
+      return rate;
+
+    }
+    // mp3ファイル　再生ストップ
+    function fncStopMP3(parta1) {
+
+      music.pause();
+      classSTOPMP3.style.display = 'none';
+      mp3Start = false;
+
+    }
+  </script>
+
+</body>
+
+</html>
